@@ -12,17 +12,17 @@ import(
 
 func Ssh(h *honeypot.Honeypot){
 
+
 	ssh.Handle(func(s ssh.Session) {
 
 	})
  
 	publicKeyOption := ssh.PublicKeyAuth(func(ctx ssh.Context, key ssh.PublicKey) bool {
 		record := state.Record{
-			User:        ctx.User(),
 			RemoteAddr:  ctx.RemoteAddr().String(),
-			Credentials: fmt.Sprintf("%s %x", key.Type(), md5.Sum(key.Marshal()[len(key.Type()):])),
+			Credentials: fmt.Sprintf("%s:%s %x",ctx.User(),key.Type(), md5.Sum(key.Marshal()[len(key.Type()):])),
+			Protocol: "ssh",
 		}
-		h.TotalVisits = h.TotalVisits + 1
 		h.Database.Add(&record)
 		log.Println(record)
 
@@ -31,9 +31,9 @@ func Ssh(h *honeypot.Honeypot){
 
 	passwordAuthOption := ssh.PasswordAuth(func(ctx ssh.Context, pass string) bool {
 		record := state.Record{
-			User:        ctx.User(),
 			RemoteAddr:  ctx.RemoteAddr().String(),
-			Credentials: pass,
+			Credentials: fmt.Sprintf("%s:%s",ctx.User(),pass),
+			Protocol: "ssh",
 		}
 
 		h.Database.Add(&record)

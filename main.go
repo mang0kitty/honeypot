@@ -9,11 +9,10 @@ import (
 
 func main() {
 	database := state.NewDatabase()
-	honeypot := &honeypot.Honeypot{Database: database, TotalVisits: 0}
+	honeypot := &honeypot.Honeypot{Database: database}
 
 	go func() {
-		handlers.Handle(database, honeypot)
-
+		handlers.Handle(database)
 	}()
 
 	protocols.Ssh(honeypot)

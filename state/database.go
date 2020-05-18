@@ -1,52 +1,44 @@
 package state
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-
-	"github.com/mang0kitty/honeypot/helpers"
-	"github.com/mang0kitty/honeypot/profile"
 )
 
 type Database struct {
-	Users map[string]*profile.User `json:"users"`
+	TotalVisits int                  `json:"totalVisits"`
+	Protocols   map[string]*Protocol `json:"protocols"`
 }
 
 func NewDatabase() *Database {
 	return &Database{
-		Users: map[string]*profile.User{},
+		TotalVisits: 0,
+		Protocols:   map[string]*Protocol{},
 	}
 }
 
 func (db *Database) Add(record *Record) {
+	db.TotalVisits++
 
-	if usr, ok := db.Users[record.RemoteAddr]; ok {
-		if !helpers.Contains(usr.Usernames, record.User) {
-			usr.Usernames = append(usr.Usernames, record.User)
-		}
+	if p, ok := db.Protocols[record.Protocol]; ok {
+		p.Visits++
 
-		if !helpers.Contains(usr.Credentials, record.Credentials) {
-			usr.Credentials = append(usr.Credentials, record.Credentials)
-		}
-
-		usr.Visits++
+		p.RemoteAddr[record.RemoteAddr]++
+		p.Credentials[record.Credentials]++
 	} else {
-		user := profile.User{
-			Usernames:   []string{record.User},
-			Credentials: []string{record.Credentials},
-			RemoteAddr:  record.RemoteAddr,
+		protocol := Protocol{
+			Name:        record.Protocol,
 			Visits:      1,
+			RemoteAddr:  map[string]int{record.RemoteAddr: 1},
+			Credentials: map[string]int{record.Credentials: 1},
 		}
-
-		db.Users[record.RemoteAddr] = &user
+		db.Protocols[record.Protocol] = &protocol
 	}
 
 	fmt.Println(db.String())
 }
 
 func (db *Database) String() string {
-	b := bytes.NewBuffer([]byte{})
-	json.NewEncoder(b).Encode(db)
-	return b.String()
+	b, _ := json.Marshal(db)
+	return string(b)
 }

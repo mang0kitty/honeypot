@@ -5,6 +5,5 @@ import (
 )
 
 type Honeypot struct {
-	Database    *state.Database
-	TotalVisits int
+	Database *state.Database
 }

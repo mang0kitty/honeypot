@@ -6,20 +6,17 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/mang0kitty/honeypot/honeypot"
 	"github.com/mang0kitty/honeypot/state"
 )
 
 type API struct {
 	Database *state.Database
-	Honeypot *honeypot.Honeypot
 }
 
-func Handle(db *state.Database, h *honeypot.Honeypot) {
+func Handle(db *state.Database) {
 	r := mux.NewRouter()
 	api := &API{
 		Database: db,
-		Honeypot: h,
 	}
 	r.HandleFunc("/stats", api.StatsHandler)
 
@@ -28,5 +25,5 @@ func Handle(db *state.Database, h *honeypot.Honeypot) {
 
 func (api *API) StatsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(api)
+	json.NewEncoder(w).Encode(api) //immediately flushed to network, little stored in memory (buffer)
 }
