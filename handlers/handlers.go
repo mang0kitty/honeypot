@@ -12,7 +12,7 @@ import (
 
 type API struct {
 	Database *state.Database
-	Honeypot *honey
+	Honeypot *honeypot.Honeypot
 }
 
 func Handle(db *state.Database, h *honeypot.Honeypot) {
