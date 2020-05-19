@@ -12,7 +12,7 @@ func TestDatabase(t *testing.T) {
 	database.Add(&state.Record{
 		RemoteAddr:  "127.0.0.1",
 		Credentials: "admin:test",
-		Protocol: "ssh"
+		Protocol:    "ssh",
 	})
 	if len(database.Protocols) != 1 {
 		t.Errorf("Record for SSH request wasn't added to the database.")

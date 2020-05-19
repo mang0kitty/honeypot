@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: honeypot
+  namespace: honeypot-staging
+  labels:
+    environment: dev
+    app: honeypot
+spec:
+  replicas: 1
+  selector:
+    matchLabels: # tells what pods the deployment will apply to
+      app: honeypot
+  template: #pod Template describing pod that is launched
+    metadata:
+      labels: # label for pod that deployment is deploying
+        environment: dev
+        app: honeypot
+    spec:
+      containers:
+        - name: honeypot
+          image: faaideen/honeypot:latest
+          ports:
+            - containerPort: 2222
+              protocol: TCP
+            - containerPort: 3000
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: honeypot-entrypoint
+  namespace: honeypot-staging
+spec:
+  type: LoadBalancer
+  selector:
+    environment: dev
+    app: honeypot
+  ports:
+    - protocol: TCP
+      name: ssh
+      port: 22 # abstracted Service port which can be any port other pods used to access the service
+      targetPort: 2222 # the port the container accepts traffic on
+    - protocol: TCP
+      name: api
+      port: 3000
+      targetPort: 3000

@@ -1,15 +1,42 @@
-FROM golang:latest
+FROM golang:alpine AS builder
 
-WORKDIR /app
+RUN apk update && apk add --no-cache git
 
-COPY go.mod go.sum ./
+WORKDIR /
 
-RUN go mod download
+COPY . . 
 
-COPY . .
+RUN go get -d -v
 
-RUN go build -o main .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /src/honeypot .
 
 EXPOSE 2222 3000
 
-CMD ["./main"]
+FROM scratch
+
+COPY --from=builder /src/honeypot /src/honeypot
+
+ENTRYPOINT ["/src/honeypot"]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
