@@ -4,7 +4,7 @@ import(
 	"crypto/md5"
 	"fmt"
 	"log"
-
+	"strings"
 	"github.com/gliderlabs/ssh"
 	"github.com/mang0kitty/honeypot/state"
 	"github.com/mang0kitty/honeypot/honeypot"
@@ -31,7 +31,7 @@ func Ssh(h *honeypot.Honeypot){
 
 	passwordAuthOption := ssh.PasswordAuth(func(ctx ssh.Context, pass string) bool {
 		record := state.Record{
-			RemoteAddr:  ctx.RemoteAddr().String(),
+			RemoteAddr:  strings.Split(ctx.RemoteAddr().String(),":")[0],
 			Credentials: fmt.Sprintf("%s:%s",ctx.User(),pass),
 			Protocol: "ssh",
 		}

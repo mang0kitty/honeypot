@@ -3,6 +3,18 @@ package state
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+)
+
+var (
+	honeypotVisitsCounter = promauto.NewCounter(
+		prometheus.CounterOpts{
+			Namespace: "honeypot",
+			Name:      "total_visits",
+			Help:      "This is the total requests made to the honeypot",
+		})
 )
 
 type Database struct {
@@ -34,6 +46,8 @@ func (db *Database) Add(record *Record) {
 		}
 		db.Protocols[record.Protocol] = &protocol
 	}
+
+	honeypotVisitsCounter.Inc()
 
 	fmt.Println(db.String())
 }

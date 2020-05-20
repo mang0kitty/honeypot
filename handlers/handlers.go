@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/mang0kitty/honeypot/state"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type API struct {
@@ -19,6 +20,7 @@ func Handle(db *state.Database) {
 		Database: db,
 	}
 	r.HandleFunc("/stats", api.StatsHandler)
+	r.Handle("/metrics", promhttp.Handler())
 
 	log.Fatal(http.ListenAndServe(":3000", r))
 }
